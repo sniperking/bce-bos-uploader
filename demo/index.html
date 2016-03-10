@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>bce-bos-uploader demo</title>
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="../bce-bos-uploader.bundle.js"></script>
+  </head>
+  <body>
+    <input type="file" id="file" />
+    <script>
+      var uploader = new BceBosUploader({
+        bce_bucket: 'baidubce',
+        uptoken_url: 'http://127.0.0.1:1337/ack',
+        browse_button: '#file',
+        multi_selection: true,
+        max_file_size: '20m',
+        max_retries: 3,
+        auto_start: true,
+        init: {
+          PostInit: function () {
+            console.log('PostInit');
+          },
+          FilesAdded: function (up, files) {
+            console.log('FilesAdded', up, files);
+          },
+          FileFiltered: function (up, file) {
+            console.log('FileFiltered', up, file.name);
+          },
+          UploadComplete: function () {
+            console.log('UploadComplete');
+          },
+          BeforeUpload: function (up, file) {
+            console.log('BeforeUpload', up, file.name);
+          },
+          UploadProgress: function (up, file, progress, e) {
+            console.log('UploadProgress', up, file.name, progress);
+          },
+          FileUploaded: function (up, file, info) {
+            console.log('FileUploaded', up, file.name, JSON.stringify(info));
+          },
+          Error: function (up, error, file) {
+            console.error('Error', up, error, file ? file.name : '<nil>');
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
