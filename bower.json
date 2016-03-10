@@ -12,7 +12,7 @@
     "uploader"
   ],
   "moduleType": [],
-  "homepage": "https://github.com/baidubce/bce-bos-uploader",
+  "homepage": "https://github.com/leeight/bce-bos-uploader",
   "ignore": [
     "**/.*",
     "node_modules",
