@@ -71,7 +71,7 @@ var kUploadComplete = 'UploadComplete';
  * BCE BOS Uploader
  *
  * @constructor
- * @param {Object} options 配置参数
+ * @param {Object|string} options 配置参数
  */
 function Uploader(options) {
     // 已经支持的参数
@@ -107,6 +107,14 @@ function Uploader(options) {
     // options.dragdrop
     // options.drop_element
     // options.init.Key
+
+    if (u.isString(options)) {
+        // 支持简便的写法，可以从 DOM 里面分析相关的配置.
+        options = u.extend({
+            browse_button: options,
+            auto_start: true
+        }, $(options).data());
+    }
 
     this.options = u.extend({}, kDefaultOptions, options);
     this.options.max_file_size = this._parseSize(this.options.max_file_size);
@@ -250,7 +258,11 @@ Uploader.prototype._invoke = function (methodName, args) {
  */
 Uploader.prototype._init = function () {
     var btn = $(this.options.browse_button);
-    btn.attr('multiple', !!this.options.multi_selection);
+    if (btn.attr('multiple') == null) {
+        // 如果用户没有显示的设置过 multiple，使用 multi_selection 的设置
+        // 否则保留 <input multiple /> 的内容
+        btn.attr('multiple', !!this.options.multi_selection);
+    }
     btn.on('change', u.bind(this._onFilesAdded, this));
 
     this.client.on('progress', u.bind(this._onUploadProgress, this));

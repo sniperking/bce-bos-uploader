@@ -1,0 +1,7 @@
+{
+  "eslint": {
+    "rules": {
+      "fecs-camelcase": 0
+    }
+  }
+}
