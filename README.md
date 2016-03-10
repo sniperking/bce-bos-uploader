@@ -69,6 +69,20 @@ var uploader = new baidubce.bos.Uploader({
 |bos_multipart_min_size|N|10M|超过这个值之后，采用分片上传的策略。如果想让所有的文件都采用分片上传，把这个值设置为0即可|
 |chunk_size|N|4M|分片上传的时候，每个分片的大小（如果没有切换到分片上传的策略，这个值没意义）|
 
+下列属性暂时不支持，看用户反馈再进行升级
+
+|*名称*|*是否必填*|*默认值*|*说明*|
+|-----|---------|-------|-----|
+|filters|N|无|文件的过滤条件|
+|get_new_uptoken|N|无|是否每次需要获取签名|
+|uptoken|N|无|sts token的内容|
+|save_key|-|-|-|
+|domain|-|-|-|
+|container|-|-|-|
+|flash_swf_url|-|-|Flash文件的地址|
+|dragdrop|-|-|-|
+|drop_element|-|-|-|
+
 ### 支持的事件
 
 在初始化 uploader 的时候，可以通过设置 init 来传递一些 回掉函数，然后 uploader 在合适的时机，会调用这些回掉函数，然后传递必要的参数。例如：
