@@ -10,7 +10,8 @@
     <input type="file" id="file" />
     <script>
       var uploader = new BceBosUploader({
-        bce_bucket: 'baidubce',
+        bos_bucket: 'baidubce',
+        bos_endpoint: 'http://localhost:8964',
         uptoken_url: 'http://127.0.0.1:1337/ack',
         browse_button: '#file',
         multi_selection: true,
@@ -35,6 +36,9 @@
           },
           UploadProgress: function (up, file, progress, e) {
             console.log('UploadProgress', up, file.name, progress);
+          },
+          UploadPartProgress: function (up, file, progress, e) {
+            console.log('UploadPartProgress', up, file.name, progress);
           },
           FileUploaded: function (up, file, info) {
             console.log('FileUploaded', up, file.name, JSON.stringify(info));
