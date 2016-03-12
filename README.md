@@ -15,7 +15,7 @@ bce-bos-uploader 是基于 [bce-sdk-js](https://github.com/baidubce/bce-sdk-js) 
 bower install bce-bos-uploader
 ```
 
-写一个最简单的页面
+写一个最简单的页面，DEMO地址是：<http://leeight.github.io/bce-bos-uploader/>
 
 ```html
 <!doctype html>
