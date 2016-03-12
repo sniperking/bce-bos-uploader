@@ -2,27 +2,175 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>bce-bos-uploader simple demo</title>
+    <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/bce-bos-uploader/bce-bos-uploader.bundle.js"></script>
+    <script src="bower_components/humanize/humanize.js"></script>
+    <style type="text/css">
+    .empty,
+    .f-status {
+        text-align: center;
+    }
+    .f-progress {
+        text-align: right;
+    }
+    .btn-file {
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-file input[type=file] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        min-width: 100%;
+        min-height: 100%;
+        font-size: 100px;
+        text-align: right;
+        filter: alpha(opacity=0);
+        opacity: 0;
+        outline: none;
+        background: white;
+        cursor: inherit;
+        display: block;
+    }
+    </style>
   </head>
   <body>
-    <p><code>文件自动上传到 baidubce 这个bucket，后台会定期清理，请勿上传重要文件。</code></p>
-    <input type="file" id="file" />
-    <p id="log"></p>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h2>bce-bos-uploader demo</h2>
+          <div class="alert alert-warning" role="alert">
+            文件自动上传到 baidubce 这个bucket，后台会定期清理，请勿上传重要文件。
+          </div>
+          <form class="form-inline">
+            <div class="form-group">
+              <span class="btn btn-default btn-file">
+                选择(100M以内)的文件<input type="file" id="file" />
+              </span>
+            </div>
+            <button type="submit" class="btn btn-success" disabled>开始上传</button>
+          </form>
+          <br />
+          <table class="table table-bordered">
+            <colgroup>
+              <col width="50px" />
+              <col width="100px" />
+              <col width="50px" />
+              <col width="100px" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>上传进度</th>
+                <th>状态</th>
+                <th>文件大小</th>
+                <th>文件名</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="5" class="empty">请选择文件...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
     <script>
-    new baidubce.bos.Uploader({
+    var __id = 0;
+    var __isEmpty = true;
+
+    function toUrl(object) {
+      var url = 'http://bos.bj.baidubce.com/v1/baidubce/' + encodeURIComponent(object);
+      return url;
+    }
+
+    function getIdByName(name) {
+      return 'f' + (__id ++);
+    }
+
+    function getRowById(rowId) {
+      return {
+        setProgress: function (progress) {
+          $('#' + rowId + ' .f-progress').html((progress * 100).toFixed(2) + '%');
+        },
+        setStatus: function (type, ok) {
+          var container = $('#' + rowId + ' .f-status');
+          container.html('<span class="glyphicon glyphicon-' + type + '"></span>');
+          if (ok === true) {
+            container.css('color', 'green');
+          }
+          else if (ok === false) {
+            container.css('color', 'red');
+          }
+        },
+        setUrl: function (url) {
+          var container = $('#' + rowId + ' .f-name');
+          var name = container.html();
+          container.html('<a href="' + url + '" target="_blank">' + name + '</a>');
+        }
+      };
+    }
+
+    var uploader = new baidubce.bos.Uploader({
       browse_button: '#file',
       multi_selection: true,
       bos_bucket: 'baidubce',
       uptoken_url: 'http://180.76.133.248:1337/ack',
-      auto_start: true,
+      auto_start: false,
       init: {
+        FilesAdded: function (_, files) {
+          for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            var id = getIdByName(file.name);
+            file.__id = id;
+            var html = '<tr id="' + id + '">'
+                       + '<td class="f-id">' + (__id) + '</td>'
+                       + '<td class="f-progress">0.00%</td>'
+                       + '<td class="f-status"><span class="glyphicon glyphicon-record"></span></td>'
+                       + '<td class="f-size">' + (humanize.filesize(file.size)) + '</td>'
+                       + '<td class="f-name">' + (file.name) + '</td>'
+                       + '</tr>';
+            if (__isEmpty) {
+              __isEmpty = false;
+              $('table tbody').html(html);
+              $('button[type=submit]').attr('disabled', false);
+            }
+            else {
+              $('table tbody').append(html);
+            }
+          }
+        },
+        BeforeUpload: function (_, file) {
+          var row = getRowById(file.__id);
+          row.setStatus('circle-arrow-up');
+        },
+        UploadProgress: function (_, file, progress, event) {
+          var row = getRowById(file.__id);
+          row.setProgress(progress);
+        },
         FileUploaded: function (_, file, info) {
-          var url = 'http://bos.bj.baidubce.com/v1/baidubce/' + encodeURIComponent(file.name);
-          $('#log').append('<div><a target="_blank" href="' + url + '">' + url + '</a></div>');
+          var row = getRowById(file.__id);
+          var url = toUrl(file.name);
+          row.setStatus('ok-circle', true);
+          row.setUrl(url);
+        },
+        UploadComplete: function () {
+          // TODO
+        },
+        Error: function (_, error, file) {
+          var row = getRowById(file.__id);
+          row.setStatus('remove-circle', false);
         }
       }
+    });
+
+    $('button[type=submit]').click(function () {
+      uploader.start();
+      return false;
     });
     </script>
   </body>
