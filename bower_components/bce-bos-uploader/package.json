@@ -1,0 +1,27 @@
+{
+  "name": "bce-bos-uploader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "fecs": "fecs src",
+    "pack": "node_modules/.bin/browserify -s baidubce.bos.Uploader src/uploader.js -o bce-bos-uploader.bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leeight/bce-bos-uploader.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^1.5.2",
+    "baidubce-sdk": "0.0.22",
+    "debug": "^2.2.0",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "browserify": "10.2.6",
+    "http-proxy": "^1.13.2"
+  }
+}

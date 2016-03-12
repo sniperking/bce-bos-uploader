@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>bce-bos-uploader simple demo</title>
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="../bce-bos-uploader.bundle.js"></script>
+  </head>
+  <body>
+    <input type="file" id="file"
+           data-multi_selection="true"
+           data-bos_bucket="baidubce"
+           data-bos_endpoint="http://localhost:8964"
+           data-uptoken_url="http://127.0.0.1:1337/ack" />
+    <script>new baidubce.bos.Uploader('#file');</script>
+  </body>
+</html>

@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>bce-bos-uploader simple demo</title>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/bce-bos-uploader/bce-bos-uploader.bundle.js"></script>
+  </head>
+  <body>
+    <p><code>文件自动上传到 baidubce 这个bucket，后台会定期清理，请勿上传重要文件。</code></p>
+    <input type="file" id="file" />
+    <p id="log"></p>
+    <script>
+    new baidubce.bos.Uploader({
+      browse_button: '#file',
+      multi_selection: true,
+      bos_bucket: 'baidubce',
+      uptoken_url: 'http://180.76.133.248:1337/ack',
+      auto_start: true,
+      init: {
+        FileUploaded: function (_, file, info) {
+          var url = 'http://bos.bj.baidubce.com/v1/baidubce/' + encodeURIComponent(file.name);
+          $('#log').append('<div><a target="_blank" href="' + url + '">' + url + '</a></div>');
+        }
+      }
+    });
+    </script>
+  </body>
+</html>
+
