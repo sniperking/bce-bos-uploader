@@ -48,7 +48,8 @@
           <form class="form-inline">
             <div class="form-group">
               <span class="btn btn-default btn-file">
-                选择(100M以内)的文件<input type="file" id="file" />
+              <span class="glyphicon glyphicon-paperclip"></span> 选择(100M以内)的文件
+                <input type="file" id="file" />
               </span>
             </div>
             <button type="submit" class="btn btn-success" disabled>开始上传</button>
@@ -84,7 +85,8 @@
     var __isEmpty = true;
 
     function toUrl(object) {
-      var url = 'http://bos.bj.baidubce.com/v1/baidubce/' + encodeURIComponent(object);
+      // var url = 'http://bos.bj.baidubce.com/v1/baidubce/' + encodeURIComponent(object);
+      var url = 'http://baidubce.bceimg.com/' + encodeURIComponent(object);
       return url;
     }
 
