@@ -34121,6 +34121,11 @@ Uploader.prototype._uploadNext = function (file, opt_maxRetries) {
     this._invoke(kBeforeUpload, [null, file]);
     this.client.putObjectFromBlob(bucket, object, file, options)
         .then(function (response) {
+            if (file.size <= 0) {
+                // 如果文件大小为0，不会触发 xhr 的 progress 事件，因此
+                // 在上传成功之后，手工触发一次
+                self._invoke(kUploadProgress, [null, file, 1]);
+            }
             self._invoke(kFileUploaded, [null, file, response]);
             // 上传成功，开始下一个
             return self._uploadNext(self._getNext());
