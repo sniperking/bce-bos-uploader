@@ -35,6 +35,11 @@
         cursor: inherit;
         display: block;
     }
+    table th,
+    .f-progress,
+    .f-size {
+        white-space: nowrap;
+    }
     </style>
   </head>
   <body>
@@ -49,26 +54,26 @@
           <form class="form-inline">
             <div class="form-group">
               <span class="btn btn-default btn-file">
-              <span class="glyphicon glyphicon-paperclip"></span> 选择(100M以内)的文件
+                <span class="glyphicon glyphicon-paperclip"></span> 选择(100M以内)的文件
                 <input type="file" id="file" />
               </span>
+              <button type="submit" class="btn btn-success" disabled>开始上传</button>
             </div>
-            <button type="submit" class="btn btn-success" disabled>开始上传</button>
           </form>
           <br />
           <table class="table table-bordered">
             <colgroup>
               <col width="50px" />
-              <col width="100px" />
               <col width="50px" />
+              <col width="80px" />
               <col width="100px" />
             </colgroup>
             <thead>
               <tr>
                 <th>#</th>
-                <th>上传进度</th>
                 <th>状态</th>
-                <th>文件大小</th>
+                <th>进度</th>
+                <th>大小</th>
                 <th>文件名</th>
               </tr>
             </thead>
@@ -132,8 +137,8 @@
             file.__id = id;
             var html = '<tr id="' + id + '">'
                        + '<td class="f-id">' + (__id) + '</td>'
-                       + '<td class="f-progress">0.00%</td>'
                        + '<td class="f-status"><span class="glyphicon glyphicon-record"></span></td>'
+                       + '<td class="f-progress">0.00%</td>'
                        + '<td class="f-size">' + (humanize.filesize(file.size)) + '</td>'
                        + '<td class="f-name">' + (file.name) + '</td>'
                        + '</tr>';
