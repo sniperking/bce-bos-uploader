@@ -40,6 +40,10 @@
     .f-size {
         white-space: nowrap;
     }
+    .f-name .alert-danger {
+        padding: 0 5px;
+        margin: 0;
+    }
     </style>
   </head>
   <body>
@@ -119,6 +123,11 @@
           var container = $('#' + rowId + ' .f-name');
           var name = container.html();
           container.html('<a href="' + url + '" target="_blank">' + name + '</a>');
+        },
+        setErrorMessage: function (errorMessage) {
+          var errorHtml = '<div class="alert alert-danger" role="alert">' + errorMessage + '</div>';
+          var container = $('#' + rowId + ' .f-name');
+          container.append(errorHtml);
         }
       };
     }
@@ -171,9 +180,9 @@
           // TODO
         },
         Error: function (_, error, file) {
-          console.error(error);
           var row = getRowById(file.__id);
           row.setStatus('remove-circle', false);
+          row.setErrorMessage(JSON.stringify(error));
         }
       }
     });
