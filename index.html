@@ -182,7 +182,8 @@
         Error: function (_, error, file) {
           var row = getRowById(file.__id);
           row.setStatus('remove-circle', false);
-          row.setErrorMessage(JSON.stringify(error));
+          var errorMessage = $.isPlainObject(error) ? JSON.stringify(error) : String(error);
+          row.setErrorMessage(errorMessage);
         }
       }
     });
