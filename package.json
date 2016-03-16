@@ -1,12 +1,12 @@
 {
   "name": "bce-bos-uploader",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "fecs": "fecs src",
-    "pack": "node_modules/.bin/browserify -s baidubce.bos.Uploader src/uploader.js | uglifyjs --compress --mangle -o bce-bos-uploader.bundle.js"
+    "pack": "node_modules/.bin/browserify -s baidubce.bos.Uploader src/uploader.js -o bce-bos-uploader.bundle.js && uglifyjs bce-bos-uploader.bundle.js --compress --mangle -o bce-bos-uploader.bundle.min.js"
   },
   "repository": {
     "type": "git",
