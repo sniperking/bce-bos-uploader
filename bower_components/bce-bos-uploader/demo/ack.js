@@ -47,6 +47,10 @@ http.createServer(function (req, res) {
     if (!query.httpMethod || !query.path || !query.params || !query.headers) {
         statusCode = 403;
     }
+    else if (query.httpMethod !== 'PUT' && query.httpMethod !== 'POST') {
+        // 只允许 PUT/POST Method
+        statusCode = 403;
+    }
     else {
         var httpMethod = query.httpMethod;
         var path = query.path;
@@ -77,7 +81,7 @@ http.createServer(function (req, res) {
             res.end(JSON.stringify(payload));
         }
     }, delay * 1000);
-}).listen(1337, '127.0.0.1');
-console.log('Server running at http://127.0.0.1:1337/');
+}).listen(1337);
+console.log('Server running at http://0.0.0.0:1337/');
 
 /* vim: set ts=4 sw=4 sts=4 tw=120: */

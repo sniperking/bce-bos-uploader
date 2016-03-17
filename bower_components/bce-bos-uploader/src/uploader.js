@@ -14,7 +14,7 @@
  * @author leeight
  */
 
-var sdk = require('baidubce-sdk');
+var sdk = require('bce-sdk-js');
 var u = require('underscore');
 var async = require('async');
 var debug = require('debug')('bce-bos-uploader');
@@ -53,6 +53,7 @@ var kDefaultOptions = {
 };
 
 var kPostInit       = 'PostInit';
+var kKey            = 'Key';
 
 // var kFilesRemoved   = 'FilesRemoved';
 var kFileFiltered   = 'FileFiltered';
@@ -233,6 +234,7 @@ Uploader.prototype._getCustomizedSignature = function (uptokenUrl) {
  *
  * @param {string} methodName 方法名称
  * @param {Array.<*>} args 调用时候的参数.
+ * @return {*} 事件的返回值.
  */
 Uploader.prototype._invoke = function (methodName, args) {
     var init = this.options.init || this.options.Init;
@@ -246,7 +248,7 @@ Uploader.prototype._invoke = function (methodName, args) {
     }
 
     try {
-        method.apply(null, args == null ? [] : args);
+        return method.apply(null, args == null ? [] : args);
     }
     catch (ex) {
         debug('%s(%j) -> %s', methodName, args, ex);
@@ -379,6 +381,10 @@ Uploader.prototype._uploadNextViaMultipart = function (file) {
     var multipartParallel = this.options.bos_multipart_parallel;
     var chunkSize = this.options.chunk_size;
     this._invoke(kBeforeUpload, [null, file]);
+
+    var returnValue = this._invoke(kKey, [null, file]);
+    object = returnValue || object;
+
     this.client.initiateMultipartUpload(bucket, object, options)
         .then(function (response) {
             uploadId = response.body.uploadId;
@@ -418,6 +424,8 @@ Uploader.prototype._uploadNextViaMultipart = function (file) {
             return self.client.completeMultipartUpload(bucket, object, uploadId, partList);
         })
         .then(function (response) {
+            response.body.bucket = bucket;
+            response.body.object = object;
             self._invoke(kFileUploaded, [null, file, response]);
         })
         .catch(function (error) {
@@ -520,13 +528,19 @@ Uploader.prototype._uploadNext = function (file, opt_maxRetries) {
                      ? this.options.max_retries
                      : opt_maxRetries;
     this._invoke(kBeforeUpload, [null, file]);
-    this.client.putObjectFromBlob(bucket, object, file, options)
+
+    var returnValue = this._invoke(kKey, [null, file]);
+    object = returnValue || object;
+
+    return this.client.putObjectFromBlob(bucket, object, file, options)
         .then(function (response) {
             if (file.size <= 0) {
                 // 如果文件大小为0，不会触发 xhr 的 progress 事件，因此
                 // 在上传成功之后，手工触发一次
                 self._invoke(kUploadProgress, [null, file, 1]);
             }
+            response.body.bucket = bucket;
+            response.body.object = object;
             self._invoke(kFileUploaded, [null, file, response]);
             // 上传成功，开始下一个
             return self._uploadNext(self._getNext());

@@ -37,7 +37,7 @@ bower install bce-bos-uploader
 </html>
 ```
 
-> 关于 uptoken_url 应该如何实现，以及如何设置过 Bucket 的 CORS 属性，在以前的文档里面有说明，这里就不赘述了。
+> 关于 uptoken_url 应该如何实现，以及如何设置过 Bucket 的 CORS 属性，请参考 bce-sdk-js 的文档：[在浏览器中直接上传文件到bos](http://baidubce.github.io/bce-sdk-js/docs/advanced-topics-basic-example-in-browser.html#content) 和 [服务端签名](http://baidubce.github.io/bce-sdk-js/docs/advanced-topics-server-signature.html#content)
 
 当然，也可以去掉 html tag 里面的 data 属性，直接用JS的方式来初始化：
 
@@ -93,6 +93,10 @@ var uploader = new baidubce.bos.Uploader({
   init: {
     PostInit: function () {
       // uploader 初始化完毕之后，调用这个函数
+    },
+    Key: function (_, file) {
+      // 如果需要重命名 BOS 存储的文件名称，这个函数
+      // 返回新的文件名即可
     },
     FileFiltered: function (_, file) {
       // 如果文件因为某些原因被过滤了，调用这个函数
