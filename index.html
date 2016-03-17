@@ -53,7 +53,7 @@
         <div class="col-md-12">
           <h2>bce-bos-uploader demo</h2>
           <div class="alert alert-warning" role="alert">
-            文件自动上传到 baidubce 这个bucket，后台会定期清理，请勿上传重要文件。
+            文件自动上传到 bce-bos-uploader 这个bucket，后台会定期清理，请勿上传重要文件。
           </div>
           <form class="form-inline">
             <div class="form-group">
@@ -95,8 +95,8 @@
     var __isEmpty = true;
 
     function toUrl(object) {
-      // var url = 'http://bos.bj.baidubce.com/v1/baidubce/' + encodeURIComponent(object);
-      var url = 'http://baidubce.bceimg.com/' + encodeURIComponent(object);
+      // var url = 'http://bj.bcebos.com/v1/bce-bos-uploader/' + encodeURIComponent(object);
+      var url = 'http://bce-bos-uploader.bceimg.com/' + encodeURIComponent(object);
       return url;
     }
 
@@ -135,7 +135,7 @@
     var uploader = new baidubce.bos.Uploader({
       browse_button: '#file',
       multi_selection: true,
-      bos_bucket: 'baidubce',
+      bos_bucket: 'bce-bos-uploader',
       uptoken_url: 'http://180.76.133.248:1337/ack',
       auto_start: false,
       max_retries: 2,
