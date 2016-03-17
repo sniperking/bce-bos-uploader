@@ -54,6 +54,10 @@ exports.getTasks = function (file, uploadId, chunkSize, bucket, object) {
 };
 
 
+exports.isPromise = function (value) {
+    return (value && typeof value.then === 'function');
+};
+
 
 
 

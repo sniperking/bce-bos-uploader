@@ -94,6 +94,10 @@ var uploader = new baidubce.bos.Uploader({
     PostInit: function () {
       // uploader 初始化完毕之后，调用这个函数
     },
+    Key: function (_, file) {
+      // 如果需要重命名 BOS 存储的文件名称，这个函数
+      // 返回新的文件名即可
+    },
     FileFiltered: function (_, file) {
       // 如果文件因为某些原因被过滤了，调用这个函数
     },

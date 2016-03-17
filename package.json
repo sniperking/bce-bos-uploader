@@ -1,6 +1,6 @@
 {
   "name": "bce-bos-uploader",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "async": "^1.5.2",
-    "baidubce-sdk": "0.0.23",
+    "bce-sdk-js": "^0.1.0",
     "debug": "^2.2.0",
     "underscore": "^1.8.3"
   },
