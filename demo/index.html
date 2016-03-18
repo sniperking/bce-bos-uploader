@@ -44,6 +44,10 @@
         padding: 0 5px;
         margin: 0;
     }
+    tr.ignored {
+      text-decoration: line-through;
+      color: gray;
+    }
     </style>
   </head>
   <body>
@@ -105,6 +109,14 @@
 
     function getRowById(rowId) {
       return {
+        setIgnore: function (ignored) {
+          if (ignored) {
+            $('#' + rowId).addClass('ignored');
+          }
+          else {
+            $('#' + rowId).removeClass('ignored');
+          }
+        },
         setProgress: function (progress) {
           $('#' + rowId + ' .f-progress').html((progress * 100).toFixed(2) + '%');
         },
@@ -173,6 +185,10 @@
         },
         BeforeUpload: function (_, file) {
           var row = getRowById(file.__id);
+          if (/\.(pdf)$/i.test(file.name)) {
+            row.setIgnore(true);
+            return false;
+          }
           row.setStatus('circle-arrow-up');
         },
         UploadProgress: function (_, file, progress, event) {

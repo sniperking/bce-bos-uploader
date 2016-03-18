@@ -108,6 +108,7 @@ var uploader = new baidubce.bos.Uploader({
     },
     BeforeUpload: function (_, file) {
       // 当某个文件开始上传的时候，调用这个函数
+      // 如果想组织这个文件的上传，请返回 false
     },
     UploadProgress: function (_, file, progress, event) {
       // 文件的上传进度

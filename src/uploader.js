@@ -382,9 +382,14 @@ Uploader.prototype._uploadNextViaMultipart = function (file) {
     var uploadId = null;
     var multipartParallel = this.options.bos_multipart_parallel;
     var chunkSize = this.options.chunk_size;
-    this._invoke(kBeforeUpload, [null, file]);
 
-    var returnValue = this._invoke(kKey, [null, file]);
+    var returnValue = this._invoke(kBeforeUpload, [null, file]);
+    if (returnValue === false) {
+        return this._uploadNext(this._getNext());
+    }
+
+    // 可能会重命名
+    returnValue = this._invoke(kKey, [null, file]);
     object = returnValue || object;
 
     this.client.initiateMultipartUpload(bucket, object, options)
@@ -529,9 +534,13 @@ Uploader.prototype._uploadNext = function (file, opt_maxRetries) {
     var maxRetries = opt_maxRetries == null
                      ? this.options.max_retries
                      : opt_maxRetries;
-    this._invoke(kBeforeUpload, [null, file]);
+    var returnValue = this._invoke(kBeforeUpload, [null, file]);
+    if (returnValue === false) {
+        return this._uploadNext(this._getNext());
+    }
 
-    var returnValue = this._invoke(kKey, [null, file]);
+    // 可能会重命名
+    returnValue = this._invoke(kKey, [null, file]);
     object = returnValue || object;
 
     return this.client.putObjectFromBlob(bucket, object, file, options)
