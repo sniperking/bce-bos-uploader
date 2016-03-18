@@ -98,11 +98,13 @@ var uploader = new baidubce.bos.Uploader({
       // 如果需要重命名 BOS 存储的文件名称，这个函数
       // 返回新的文件名即可
     },
-    FileFiltered: function (_, file) {
-      // 如果文件因为某些原因被过滤了，调用这个函数
-    },
     FilesAdded: function (_, files) {
       // 当文件被加入到队列里面，调用这个函数
+    },
+    FilesFilter: function (_, files) {
+      // 如果需要对加入到队列里面的文件，进行过滤，可以在
+      // 这个函数里面实现自己的逻辑
+      // 返回值需要是一个数组，里面保留需要添加到队列的文件
     },
     BeforeUpload: function (_, file) {
       // 当某个文件开始上传的时候，调用这个函数

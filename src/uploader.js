@@ -58,6 +58,7 @@ var kKey            = 'Key';
 // var kFilesRemoved   = 'FilesRemoved';
 var kFileFiltered   = 'FileFiltered';
 var kFilesAdded     = 'FilesAdded';
+var kFilesFilter    = 'FilesFilter';
 
 var kBeforeUpload   = 'BeforeUpload';
 // var kUploadFile     = 'UploadFile';       // ??
@@ -292,15 +293,16 @@ Uploader.prototype._filterFiles = function (candidates) {
         return true;
     });
 
-    return files;
+    return this._invoke(kFilesFilter, [null, files]) || files;
 };
 
 Uploader.prototype._onFilesAdded = function (e) {
     var files = this._filterFiles(e.target.files);
-    if (files.length) {
+    if (u.isArray(files) && files.length) {
         this._invoke(kFilesAdded, [null, files]);
         this._files.push.apply(this._files, files);
     }
+
     if (this.options.auto_start) {
         this.start();
     }

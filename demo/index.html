@@ -139,6 +139,16 @@
       auto_start: false,
       max_retries: 2,
       init: {
+        FilesFilter: function (_, files) {
+          var returnValue = [];
+          for (var i = 0; i < files.length; i ++) {
+            var file = files[i];
+            if (/\.(zip|rar|pdf)$/i.test(file.name)) {
+              returnValue.push(file);
+            }
+          }
+          return returnValue;
+        },
         FilesAdded: function (_, files) {
           for (var i = 0; i < files.length; i++) {
             var file = files[i];
