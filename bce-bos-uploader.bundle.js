@@ -34290,6 +34290,9 @@ var kDefaultOptions = {
     // 分片上传的时候，并行上传的个数，默认（1）
     bos_multipart_parallel: 1,
 
+    // 计算签名的时候，有些 header 需要剔除，减少传输的体积
+    auth_stripped_headers: ['User-Agent', 'Connection'],
+
     // 分片上传的时候，每个分片的大小，默认（4M）
     chunk_size: '4mb'
 };
@@ -34441,9 +34444,15 @@ Uploader.prototype._parseSize = function (size) {
 };
 
 Uploader.prototype._getCustomizedSignature = function (uptokenUrl) {
+    var options = this.options;
+
     return function (_, httpMethod, path, params, headers) {
         if (/\bed=([\w\.]+)\b/.test(location.search)) {
             headers.Host = RegExp.$1;
+        }
+
+        if (u.isArray(options.auth_stripped_headers)) {
+            headers = u.omit(headers, options.auth_stripped_headers);
         }
 
         var deferred = sdk.Q.defer();

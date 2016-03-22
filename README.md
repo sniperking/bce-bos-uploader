@@ -63,6 +63,7 @@ var uploader = new baidubce.bos.Uploader({
 |browse_button|Y|无|需要初始化的`<input type="file"/>`|
 |bos_endpoint|N|http://bos.bj.baidubce.com|BOS服务器的地址|
 |bos_credentials|N|{}|如果没有设置`uptoken_url`的话，必须有这个配置才可以工作|
+|auth_stripped_headers|N|['User-Agent', 'Connection']|如果计算签名的时候，需要剔除一些headers，可以配置这个参数|
 |multi_selection|N|false|是否可以选择多个文件|
 |max_retries|N|0|如果上传文件失败之后，支持的重试次数。默认不重试|
 |auto_start|N|false|选择文件之后，是否自动上传|
