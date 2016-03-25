@@ -70,6 +70,7 @@ var uploader = new baidubce.bos.Uploader({
 |max_file_size|N|100M|可以选择的最大文件，超过这个值之后，会被忽略掉|
 |bos_multipart_min_size|N|10M|超过这个值之后，采用分片上传的策略。如果想让所有的文件都采用分片上传，把这个值设置为0即可|
 |chunk_size|N|4M|分片上传的时候，每个分片的大小（如果没有切换到分片上传的策略，这个值没意义）|
+|bos_multipart_auto_continue|N|true|是否开启断点续传，如果设置成false，则UploadResume和UploadResumeError事件不会生效|
 
 下列属性暂时不支持，看用户反馈再进行升级
 
@@ -125,6 +126,12 @@ var uploader = new baidubce.bos.Uploader({
     },
     UploadComplete: function () {
       // 队列里面的文件上传结束了，调用这个函数
+    },
+    UploadResume: function (_, file, partList, event) {
+      // 断点续传生效时，调用这个函数，partList表示上次中断时，已上传完成的分块列表
+    },
+    UploadResumeError: function (_, file, error, event) {
+      // 尝试进行断点续传失败时，调用这个函数
     }
   }
 });
