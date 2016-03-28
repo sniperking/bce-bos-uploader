@@ -6,8 +6,9 @@
     <title>bce-bos-uploader simple demo</title>
     <link rel="stylesheet" type="text/css" href="../bower_components/bootstrap/dist/css/bootstrap.min.css" />
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>
-    <script src="../bce-bos-uploader.bundle.js"></script>
+    <script src="../bower_components/plupload/js/plupload.full.min.js"></script>
     <script src="../bower_components/humanize/humanize.js"></script>
+    <script src="../bce-bos-uploader.bundle.js"></script>
     <style type="text/css">
     .empty,
     .f-status {
@@ -93,6 +94,16 @@
           </table>
         </div>
       </div>
+      <div class="row">
+        <div class="col-md-12">
+          <h2>plupload</h2>
+
+          <div id="container">
+            <a id="browse" href="javascript:;">[Browse...]</a> 
+            <a id="start-upload" href="javascript:;">[Start Upload]</a>
+          </div>
+        </div>
+      </div>
     </div>
     <script>
     var __id = 0;
@@ -147,6 +158,9 @@
       browse_button: '#file',
       multi_selection: true,
       bos_bucket: 'bce-bos-uploader',
+      // bos_ak: 'ak',
+      // bos_sk: 'sk',
+      // uptoken: 'uptoken',
       uptoken_url: 'http://180.76.133.248:1337/ack',
       auto_start: false,
       max_retries: 2,
@@ -232,6 +246,43 @@
       uploader.start();
       return false;
     });
+    </script>
+    <script>
+    (function () {
+      var uploader = new plupload.Uploader({
+        runtimes: 'html4',
+        browse_button: 'browse',
+        flash_swf_url: '../bower_components/plupload/js/Moxie.swf',
+        url: 'https://bos.qasandbox.bcetest.baidu.com/bcecdn/',
+        send_file_name: false,
+        multipart_params: {
+          'Content-Type': 'text/plain',
+          'x-bce-foo': 'bar',
+          'x-bce-bar': 'foo',
+          // 'success-action-status': '201',
+          // 'success-action-redirect': 'http://localhost.baidu.com/demo/relay.html'
+        }
+      });
+      uploader.bind('BeforeUpload', function (up, file) {
+        var params = up.getOption('multipart_params');
+        params.key = file.target_name || file.name;
+        params['success-action-redirect'] = 'http://localhost.baidu.com/demo/relay.html?id=' + file.id;
+      });
+      uploader.bind('UploadFile', function (up, file) {
+        console.log('UploadFile', file.percent, file.status);
+      });
+      uploader.bind('UploadProgress', function (up, file) {
+        console.log('UploadProgress', file.percent, file.status);
+      });
+      uploader.bind('FileUploaded', function (up, file, info) {
+        console.log('FileUploaded', file.percent, file.status, info);
+      });
+      uploader.init();
+
+      $('#start-upload').click(function () {
+        uploader.start();
+      });
+    })();
     </script>
   </body>
 </html>

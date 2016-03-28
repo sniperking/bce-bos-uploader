@@ -34270,7 +34270,7 @@ var kDefaultOptions = {
     bos_endpoint: 'http://bos.bj.baidubce.com',
 
     // 默认的 ak 和 sk 配置
-    bos_credentials: {},
+    bos_credentials: null,
 
     // 是否支持多选，默认（false）
     multi_selection: false,
@@ -34330,6 +34330,7 @@ function Uploader(options) {
     // options.runtimes
     // options.browse_button
     // options.uptoken_url
+    // options.uptoken
     // options.max_file_size
     // options.max_retries
     // options.chunk_size
@@ -34351,7 +34352,6 @@ function Uploader(options) {
     // 暂时不支持的参数
     // options.filters
     // options.get_new_uptoken
-    // options.uptoken
     // options.unique_names
     // options.save_key
     // options.domain
@@ -34370,18 +34370,27 @@ function Uploader(options) {
     }
 
     this.options = u.extend({}, kDefaultOptions, options);
-    this.options.max_file_size = this._parseSize(this.options.max_file_size);
+    this.options.max_file_size = utils.parseSize(this.options.max_file_size);
     this.options.bos_multipart_min_size
-        = this._parseSize(this.options.bos_multipart_min_size);
+        = utils.parseSize(this.options.bos_multipart_min_size);
     this.options.chunk_size = this._resetChunkSize(
-        this._parseSize(this.options.chunk_size));
+        utils.parseSize(this.options.chunk_size));
+
+    var credentials = this.options.bos_credentials;
+    if (!credentials && this.options.bos_ak && this.options.bos_sk) {
+        credentials = {
+            ak: this.options.bos_ak,
+            sk: this.options.bos_sk
+        };
+    }
 
     /**
      * @type {sdk.BosClient}
      */
     this.client = new sdk.BosClient({
         endpoint: this.options.bos_endpoint,
-        credentials: this.options.bos_credentials
+        credentials: credentials,
+        sessionToken: this.options.uptoken
     });
 
     if (this.options.uptoken_url) {
@@ -34419,34 +34428,6 @@ function Uploader(options) {
 Uploader.prototype._resetChunkSize = function (chunkSize) {
     // TODO
     return chunkSize;
-};
-
-Uploader.prototype._parseSize = function (size) {
-    if (typeof size === 'number') {
-        return size;
-    }
-
-    // mb MB Mb M
-    // kb KB kb k
-    // 100
-    var pattern = /^([\d\.]+)([mkg]b?)$/i;
-    var match = pattern.exec(size);
-    if (!match) {
-        return 0;
-    }
-
-    var $1 = match[1];
-    var $2 = match[2];
-    if (/^k/i.test($2)) {
-        return $1 * 1024;
-    }
-    else if (/^m/i.test($2)) {
-        return $1 * 1024 * 1024;
-    }
-    else if (/^g/i.test($2)) {
-        return $1 * 1024 * 1024;
-    }
-    return +$1;
 };
 
 Uploader.prototype._getCustomizedSignature = function (uptokenUrl) {
@@ -34615,12 +34596,10 @@ Uploader.prototype._getNext = function () {
     return this._files.shift();
 };
 
-Uploader.prototype._uploadNextViaMultipart = function (file) {
-    var bucket = this.options.bos_bucket;
-    var object = file.name;
-
+Uploader.prototype._guessContentType = function (file) {
     var contentType = file.type;
     if (!contentType) {
+        var object = file.name;
         var ext = object.split(/\./g).pop();
         contentType = sdk.MimeType.guess(ext);
     }
@@ -34631,6 +34610,14 @@ Uploader.prototype._uploadNextViaMultipart = function (file) {
         contentType += '; charset=UTF-8';
     }
 
+    return contentType;
+};
+
+Uploader.prototype._uploadNextViaMultipart = function (file) {
+    var bucket = this.options.bos_bucket;
+    var object = file.name;
+
+    var contentType = this._guessContentType(file);
     var options = {
         'Content-Type': contentType
     };
@@ -34856,15 +34843,7 @@ Uploader.prototype._uploadNext = function (file, opt_maxRetries) {
     var bucket = this.options.bos_bucket;
     var object = file.name;
 
-    var contentType = file.type;
-    if (!contentType) {
-        var ext = object.split(/\./g).pop();
-        contentType = sdk.MimeType.guess(ext);
-    }
-    if (/^text\//.test(contentType)) {
-        contentType += '; charset=UTF-8';
-    }
-
+    var contentType = this._guessContentType(file);
     var options = {
         'Content-Type': contentType
     };
@@ -34978,6 +34957,34 @@ exports.getTasks = function (file, uploadId, chunkSize, bucket, object) {
     }
 
     return tasks;
+};
+
+exports.parseSize = function (size) {
+    if (typeof size === 'number') {
+        return size;
+    }
+
+    // mb MB Mb M
+    // kb KB kb k
+    // 100
+    var pattern = /^([\d\.]+)([mkg]b?)$/i;
+    var match = pattern.exec(size);
+    if (!match) {
+        return 0;
+    }
+
+    var $1 = match[1];
+    var $2 = match[2];
+    if (/^k/i.test($2)) {
+        return $1 * 1024;
+    }
+    else if (/^m/i.test($2)) {
+        return $1 * 1024 * 1024;
+    }
+    else if (/^g/i.test($2)) {
+        return $1 * 1024 * 1024;
+    }
+    return +$1;
 };
 
 exports.isPromise = function (value) {

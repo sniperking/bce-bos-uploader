@@ -56,6 +56,34 @@ exports.getTasks = function (file, uploadId, chunkSize, bucket, object) {
     return tasks;
 };
 
+exports.parseSize = function (size) {
+    if (typeof size === 'number') {
+        return size;
+    }
+
+    // mb MB Mb M
+    // kb KB kb k
+    // 100
+    var pattern = /^([\d\.]+)([mkg]b?)$/i;
+    var match = pattern.exec(size);
+    if (!match) {
+        return 0;
+    }
+
+    var $1 = match[1];
+    var $2 = match[2];
+    if (/^k/i.test($2)) {
+        return $1 * 1024;
+    }
+    else if (/^m/i.test($2)) {
+        return $1 * 1024 * 1024;
+    }
+    else if (/^g/i.test($2)) {
+        return $1 * 1024 * 1024;
+    }
+    return +$1;
+};
+
 exports.isPromise = function (value) {
     return (value && typeof value.then === 'function');
 };
