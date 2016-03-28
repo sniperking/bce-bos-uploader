@@ -1,7 +1,7 @@
 {
   "name": "bce-bos-uploader",
-  "version": "1.0.9",
-  "description": "",
+  "version": "1.1.0",
+  "description": "Baidu Object Storage Uploader",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,7 +12,7 @@
     "type": "git",
     "url": "https://github.com/leeight/bce-bos-uploader.git"
   },
-  "author": "",
+  "author": "leeight@gmail.com",
   "license": "ISC",
   "dependencies": {
     "async": "^1.5.2",
