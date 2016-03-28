@@ -14,6 +14,9 @@
  * @author leeight
  */
 
+var u = require('underscore');
+var Q = require('bce-sdk-js').Q;
+
 /**
  * 把文件进行切片，返回切片之后的数组
  *
@@ -53,17 +56,48 @@ exports.getTasks = function (file, uploadId, chunkSize, bucket, object) {
     return tasks;
 };
 
-
 exports.isPromise = function (value) {
     return (value && typeof value.then === 'function');
 };
 
+exports.generateLocalKey = function (option) {
+    return Q.resolve([option.blob.name, option.blob.size, option.chunkSize, option.bucket, option.object].join('&'));
+};
 
+exports.getUploadId = function (key) {
+    return localStorage.getItem(key);
+};
 
+exports.setUploadId = function (key, uploadId) {
+    return localStorage.setItem(key, uploadId);
+};
 
+exports.removeUploadId = function (key) {
+    return localStorage.removeItem(key);
+};
 
+/**
+ * 取得已上传分块的etag
+ *
+ * @param {number} partNumber 分片序号.
+ * @param {Array} existParts 已上传完成的分片信息.
+ * @return {string} 指定分片的etag
+ */
+function getPartEtag(partNumber, existParts) {
+    var matchParts = u.filter(existParts || [], function (part) {
+        return +part.partNumber === partNumber;
+    });
+    return matchParts.length ? matchParts[0].eTag : null;
+}
 
-
-
+exports.filterTasks = function (tasks, parts) {
+    u.each(tasks, function (task) {
+        var partNumber = task.partNumber;
+        var etag = getPartEtag(partNumber, parts);
+        if (etag) {
+            task.etag = etag;
+        }
+    });
+};
 
 /* vim: set ts=4 sw=4 sts=4 tw=120: */
