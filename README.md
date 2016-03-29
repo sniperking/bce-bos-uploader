@@ -62,7 +62,9 @@ var uploader = new baidubce.bos.Uploader({
 |uptoken_url|Y|无|用来进行服务端签名的URL，需要支持JSONP|
 |browse_button|Y|无|需要初始化的`<input type="file"/>`|
 |bos_endpoint|N|http://bos.bj.baidubce.com|BOS服务器的地址|
-|bos_credentials|N|{}|如果没有设置`uptoken_url`的话，必须有这个配置才可以工作|
+|bos_ak|N|无|如果没有设置`uptoken_url`的话，必须有`ak`和`sk`这个配置才可以工作|
+|bos_sk|N|无|如果没有设置`uptoken_url`的话，必须有`ak`和`sk`这个配置才可以工作|
+|uptoken|N|无|sts token的内容|
 |auth_stripped_headers|N|['User-Agent', 'Connection']|如果计算签名的时候，需要剔除一些headers，可以配置这个参数|
 |multi_selection|N|false|是否可以选择多个文件|
 |max_retries|N|0|如果上传文件失败之后，支持的重试次数。默认不重试|
@@ -78,7 +80,6 @@ var uploader = new baidubce.bos.Uploader({
 |-----|---------|-------|-----|
 |filters|N|无|文件的过滤条件|
 |get_new_uptoken|N|无|是否每次需要获取签名|
-|uptoken|N|无|sts token的内容|
 |save_key|-|-|-|
 |domain|-|-|-|
 |container|-|-|-|
