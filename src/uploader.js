@@ -357,8 +357,7 @@ Uploader.prototype._getNext = function () {
 Uploader.prototype._guessContentType = function (file) {
     var contentType = file.type;
     if (!contentType) {
-        var object = file.name;
-        var ext = object.split(/\./g).pop();
+        var ext = file.name.split(/\./g).pop();
         contentType = sdk.MimeType.guess(ext);
     }
 
@@ -373,7 +372,7 @@ Uploader.prototype._guessContentType = function (file) {
 
 Uploader.prototype._uploadNextViaMultipart = function (file) {
     var bucket = this.options.bos_bucket;
-    var object = file.name;
+    var object = file.object || file.name;
 
     var contentType = this._guessContentType(file);
     var options = {
@@ -652,6 +651,67 @@ Uploader.prototype._listParts = function (bucket, object, uploadId) {
         .then(function (response) {
             return response.body.parts;
         });
+};
+
+// 静态方法 - 将Upload作为VOD或DOC的上传工具
+Uploader.attachToSdk = function (config) {
+    function upload(client, service, resourceId, bucket, object, blob, options) {
+        var deferred = sdk.Q.defer();
+        config = config || {};
+        config.bos_bucket = bucket;
+        config.init = {
+            FileUploaded: function () {
+                deferred.resolve(null);
+            },
+            Error: function (_, error) {
+                deferred.reject(error);
+            },
+            UploadProgress: (function (count) {
+                return function (_, _file, progress) {
+                    if (count) {
+                        count--;
+                        // 保存其他服务的资源ID
+                        var localSaveKey = [blob.name, blob.size, service].join('&');
+                        var localSaveValue = {
+                            id: resourceId,
+                            bucket: bucket,
+                            object: object
+                        };
+                        localStorage.setItem(localSaveKey, JSON.stringify(localSaveValue));
+                    }
+                    client.emit('progress', {
+                        lengthComputable: true,
+                        loaded: progress,
+                        total: 1
+                    });
+                }
+            })(1)
+        };
+        var _uploader = new Uploader(config);
+        _uploader.client = client;
+        blob.object = object;
+        _uploader._files = [blob];
+        _uploader.start();
+        return deferred.promise;
+    }
+
+    function beforeUpload(blob, service) {
+        var localSaveKey = [blob.name, blob.size, service].join('&');
+        var localSaveValue = localStorage.getItem(localSaveKey);
+        return JSON.parse(localSaveValue);
+    }
+
+    function afterUpload(blob, service) {
+        var localSaveKey = [blob.name, blob.size, service].join('&');
+        localStorage.removeItem(localSaveKey);
+        return false;
+    }
+
+    sdk.uploadStrategy('bce-bos-uploader', {
+        upload: upload,
+        beforeUpload: beforeUpload,
+        afterUpload: afterUpload
+    }, true);
 };
 
 module.exports = Uploader;
